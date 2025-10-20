@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Single Page</title>
+        <style>
+            button {
+                margin: 5px;
+            }
+            button.active {
+                background: #28a745;
+            }
+            #content {
+                margin-top: 20px;
+            }
+        </style>
+        <script>
+            // Shows given section
+            function showSection(section, pushState = true) {
+                // Update browser URL without page reload
+                if (pushState) {
+                    const newUrl = `?section=${section}`;
+                    window.history.pushState({section: section}, '', newUrl);
+                }
+                
+                // Find section text from server
+                fetch(`/sections/${section}`)
+                .then(response => response.text())
+                .then(text => {
+                    // Log text and display on page
+                    console.log(`Section ${section}:`, text);
+                    document.querySelector('#content').innerHTML = `<h3>Section ${section}</h3><p>${text}</p>`;
+                    
+                    // Update active button
+                    document.querySelectorAll('button').forEach(btn => {
+                        if (btn.dataset.section === section) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                });
+            }
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.section) {
+                    showSection(event.state.section, false);
+                } else {
+                    // Show default content when no section specified
+                    document.querySelector('#content').innerHTML = '<p>Welcome! Please click a section button above.</p>';
+                    document.querySelectorAll('button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                }
+            });
+            
+            // Parse URL parameters on page load
+            function getUrlSection() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('section');
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Add button functionality
+                document.querySelectorAll('button').forEach(button => {
+                    button.onclick = function() {
+                        showSection(this.dataset.section);
+                    };
+                });
+                
+                // Check if URL has section parameter
+                const urlSection = getUrlSection();
+                if (urlSection && ['1', '2', '3'].includes(urlSection)) {
+                    // Show section from URL
+                    showSection(urlSection, false);
+                } else {
+                    // Show welcome message
+                    document.querySelector('#content').innerHTML = '<p>Welcome! Please click a section button above.</p>';
+                    
+                    // Initialize browser history with current state
+                    window.history.replaceState({}, '', window.location.pathname);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Hello!</h1>
+        <button data-section="1">Section 1</button>
+        <button data-section="2">Section 2</button>
+        <button data-section="3">Section 3</button>
+        <div id="content">
+        </div>
+    </body>
+</html>
