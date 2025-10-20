@@ -1,16 +1,16 @@
-from django.http import Http404, HttpResponse
 from django.shortcuts import render
 
-# Create your views here.
 def index(request):
-    return render(request, "helloworld/index.html")
-
-# The texts are much longer in reality, but have
-# been shortened here to save space
-texts = ["Text 1", "Text 2", "Text 3"]
-
-def section(request, num):
-    if 1 <= num <= 3:
-        return HttpResponse(texts[num - 1])
-    else:
-        raise Http404("No such section")
+    """个人信息页面视图"""
+    # 学生信息
+    student_info = {
+        'name': '王斌',  # 姓名：王斌
+        'student_id': '20231201080'  # 学号：20231201080
+    }
+    
+    context = {
+        'name': student_info['name'],
+        'student_id': student_info['student_id']
+    }
+    
+    return render(request, 'helloworld/index.html', context)

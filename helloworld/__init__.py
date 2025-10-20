@@ -1,1 +1,0 @@
-# helloworld Django应用
